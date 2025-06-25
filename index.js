@@ -30,10 +30,8 @@ export default async function handler(req, res) {
   if (query.url) {
     const code = memory[query.url];
     if (!code) {
-      return res.status(404).json({
-        status: "error",
-        message: "Code not found or expired"
-      });
+      res.status(404).send("Code not found or expired");
+      return;
     }
 
     const response = await fetch("https://emkc.org/api/v2/piston/execute", {
@@ -45,11 +43,9 @@ export default async function handler(req, res) {
       })
     });
     const result = await response.json();
-    return res.status(200).json({
-      status: "success",
-      type: "execute",
-      output: result.output
-    });
+    res.setHeader("Content-Type", "text/plain");
+    res.status(200).send(result.output || "No output");
+    return;
   }
 
   res.status(400).json({
