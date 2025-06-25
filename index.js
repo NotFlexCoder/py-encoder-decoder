@@ -14,7 +14,7 @@ export default async function handler(req, res) {
       status: "success",
       type: "encode",
       encoded,
-      test_url: url
+      demo_view: url
     });
   }
 
@@ -39,12 +39,15 @@ export default async function handler(req, res) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         language: "python",
-        source: code
+        version: "3.10.0",
+        files: [{ content: code }]
       })
     });
+
     const result = await response.json();
+    const output = result.run?.stdout || result.run?.stderr || "No output";
     res.setHeader("Content-Type", "text/plain");
-    res.status(200).send(result.output || "No output");
+    res.status(200).send(output);
     return;
   }
 
