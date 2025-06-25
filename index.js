@@ -35,15 +35,21 @@ export default async function handler(req, res) {
         message: "Code not found or expired"
       });
     }
-    const { exec } = await import('child_process');
-    exec(`python3 -c ${JSON.stringify(code)}`, (error, stdout, stderr) => {
-      res.status(200).json({
-        status: "success",
-        type: "execute",
-        output: stdout || stderr
-      });
+
+    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        language: "python",
+        source: code
+      })
     });
-    return;
+    const result = await response.json();
+    return res.status(200).json({
+      status: "success",
+      type: "execute",
+      output: result.output
+    });
   }
 
   res.status(400).json({
